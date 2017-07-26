@@ -7,15 +7,16 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     <spring:beans>
         <spring:import resource="classpath:order-system.xml"/>
     </spring:beans>
-    <munit:test name="returns2ElementMap" description="test: returns2ElementMap">
+    <munit:before-test name="order-testsBefore_Test" description="Before tests actions">
         <munit:set payload="#[[{'orderID':444, 'location':'international','price':14.01}, {'orderID':444, 'location':'international','price':14.01}, {'orderID':555, 'location':'domestic','price':14.01}]]" doc:name="Set Message"/>
+    </munit:before-test>
+    <munit:test name="returns2ElementMap" description="test: returns2ElementMap">
         <flow-ref name="processOrders" doc:name="processOrders"/>
         <munit:assert-true condition="#[message.payload is java.util.Map]" doc:name="Assert True"/>
         <munit:assert-on-equals expectedValue="#[2]" actualValue="#[message.payload.size()]" doc:name="Assert Equals"/>
     </munit:test>
 
     <munit:test name="intlKeyReturnsIntlOrders" description="test: order type">
-        <munit:set payload="#[[{'orderID':444, 'location':'international','price':14.01}, {'orderID':444, 'location':'international','price':14.01}, {'orderID':555, 'location':'domestic','price':14.01}]]" doc:name="Set Message"/>
         <flow-ref name="processOrders" doc:name="processOrders"/>
         <munit:assert-true condition="#[message.payload.'international'.size() &gt; 0]" doc:name="Assert True"/>
         <foreach collection="#[payload.'international']" doc:name="For Each">
@@ -24,7 +25,6 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     </munit:test>
 
     <munit:test name="domKeyReturnsDomOrders" description="test: order type">
-        <munit:set payload="#[[{'orderID':444, 'location':'international','price':14.01}, {'orderID':444, 'location':'international','price':14.01}, {'orderID':555, 'location':'domestic','price':14.01}]]" doc:name="Set Message"/>
         <flow-ref name="processOrders" doc:name="processOrders"/>
         <munit:assert-true condition="#[message.payload.'domestic'.size() &gt; 0]" doc:name="Assert True"/>
         <foreach collection="#[payload.'domestic']" doc:name="For Each">
